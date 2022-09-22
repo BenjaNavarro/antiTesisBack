@@ -18,17 +18,21 @@ app.get('/',(req,res)=>{
 });
 
 io.on('connection',(socket)=>{
+  console.log('Socket Connected');
   socket.emit('me',socket.id);
 
   socket.on('disconnect',()=>{
+    console.log('Socket Disconnected');
     socket.broadcast.emit('callended');
   });
 
   socket.on('calluser',({userToCall,signalData,from,name})=>{
-    io.to(userToCall).emit('callUser',{signal:signalData,from,name});
+    console.log('Calling User');
+    io.to(userToCall).emit('calluser',{signal:signalData,from,name});
   });
 
   socket.on('answercall',(data)=>{
+    console.log('Calling User');
     io.to(data.to).emit('callaccepted',data.signal);
   });
 })
