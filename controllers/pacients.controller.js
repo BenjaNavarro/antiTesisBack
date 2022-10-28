@@ -3,6 +3,28 @@ const Pacient = require('../models/Pacient');
 const _ = require('lodash');
 
 
+//api/pacients GET
+PacientController.getPacients = async (req,res) => {
+  try{
+    const pacients =await Pacient.find();
+    console.log(pacients);
+    if(!pacients){
+      return res
+        .status(404)
+        .send({ error: "Pacients not found"})
+    }else{
+      return res
+        .status(200)
+        .send(pacients)
+    }
+  }catch{
+    res
+    .status(500)
+    .send({ name: error.name, info: error.message })
+  }
+
+}
+
 //api/pacients/new POST
 PacientController.newPacient = async (req,res) => {
   try {
