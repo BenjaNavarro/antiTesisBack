@@ -4,3 +4,5 @@ const TerapistController = require('../controllers/terapist.controller');
 const router = express.Router();
 
 router.post('/terapists/new',TerapistController.NewTerapist);
+
+module.exports = router;

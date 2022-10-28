@@ -10,21 +10,21 @@ const format = rut.format;
 
 const TerapistSchema = mongoose.Schema(
   {
-    names:{
+    name:{
       type: String,
       required: true,
       trim: true
     },
-    firstLastName:{
+    lastName:{
       type: String,
       required: true,
       trim: true
     },
-    secondLastName:{
-      type: String,
-      required: true,
-      trim: true
-    },
+    // secondLastName:{
+    //   type: String,
+    //   required: true,
+    //   trim: true
+    // },
     email:{
       type: String,
       required: true,
@@ -56,8 +56,8 @@ const TerapistSchema = mongoose.Schema(
       trim: true,
       lowercase: true,
       validate: (value) => {
-        if (value != "masculino" && value != "femenino") {
-          this.invalidate("sexo", "sex not found");
+        if (value != "male" && value != "female") {
+          this.invalidate("gender", "sex not found");
         }
       },
     },

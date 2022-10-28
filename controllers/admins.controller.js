@@ -2,6 +2,7 @@ const AdminController = {};
 const Admin = require('../models/Admin');
 const _ = require('lodash');
 
+// POST /api/admins/new_admin
 AdminController.NewAdmin = async(req,res) => {
   try {
     const RUT = req.body.RUT;
@@ -12,12 +13,13 @@ AdminController.NewAdmin = async(req,res) => {
         .send({ error: "USER RUT ALREADY REGISTERED!" });
     }else{
       const {
-        names,
-        firstLastName,
-        secondLastName,
+        name,
+        lastName,
+        // secondLastName,
         RUT,
         email,
         birthDate,
+        address,
         gender,
         phone,
         password,
@@ -26,12 +28,13 @@ AdminController.NewAdmin = async(req,res) => {
       const createdAdmin = new Admin(
         _.pickBy(
           {
-            names,
-            firstLastName,
-            secondLastName,
+            name,
+            lastName,
+            // secondLastName,
             RUT,
             email,
             birthDate,
+            address,
             gender,
             phone,
             password,
@@ -53,3 +56,28 @@ AdminController.NewAdmin = async(req,res) => {
       .send({ name: error.name, info: error.message });
   }
 }
+
+AdminController.Login = async(req,res) => {
+  try {
+    const { rut, password } = req.body;
+    const admin = await Admin.findByCredentials(rut,password);
+    if (admin) {
+      console.log('ADMIN LOGIN SUCCESFULL!');
+      return res
+        .status(200)
+        .json({status:200,admin:admin});
+    } else {
+      console.log('ADMIN NOT FOUND!');
+      return res
+      .status(400)
+      .json({status:400,message:'Admin not found!'});
+    }
+  } catch (error) {
+    console.log('ADMIN LOGIN ERROR!',error);
+    res
+      .status(500)
+      .send({ name: error.name, info: error.message });
+  }
+}
+
+module.exports = AdminController;

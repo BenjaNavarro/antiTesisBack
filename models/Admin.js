@@ -14,16 +14,16 @@ const AdminSchema = mongoose.Schema(
       type:String,
       required:true,
     },
-    firstLastName:{
+    lastName:{
       type: String,
       required: true,
       trim: true
     },
-    secondLastName:{
-      type: String,
-      required: true,
-      trim: true
-    },
+    // secondLastName:{
+    //   type: String,
+    //   required: true,
+    //   trim: true
+    // },
     email:{
       type: String,
       required: true,
@@ -55,8 +55,8 @@ const AdminSchema = mongoose.Schema(
       trim: true,
       lowercase: true,
       validate: (value) => {
-        if (value != "masculino" && value != "femenino") {
-          this.invalidate("sexo", "sex not found");
+        if (value != "male" && value != "female") {
+          this.invalidate("gender", "sex not found");
         }
       },
     },
@@ -139,5 +139,25 @@ AdminSchema.pre('save',async function(next){
   }
   next();
 });
+
+AdminSchema.statics.findByCredentials = async function (RUT, password){
+  try {
+    const user = await this.findOne({ RUT: clean(RUT)}).exec();
+    // console.log({user});
+    if(user){
+      const match = await bcrypt.compare(password,user.password);
+      if(match){
+        return user;
+      }else{
+        const err = new Error('Incorrect Password');
+      }
+    }else{
+      const err = new Error('Rut not Registered!');
+    }
+  } catch (error) {
+    console.log({error});
+    return error;
+  }
+};
 
 module.exports = mongoose.model('Admin',AdminSchema);

@@ -1,54 +1,51 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const rut = require('rut.js');
-const validate = rut.validate;
+// const validate = rut.validate;
 const uniqueValidator = require('mongoose-unique-validator');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const clean = rut.clean;
-const format = rut.format;
+// const jwt = require('jsonwebtoken');
+// const clean = rut.clean;
+// const format = rut.format;
 
 const PacientSchema = mongoose.Schema(
   {
-    names:{
+    name:{
       type: String,
       required: true,
       trim: true
     },
-    firstLastName:{
+    lastName:{
       type: String,
       required: true,
       trim: true
     },
-    secondLastName:{
-      type: String,
-      required: true,
-      trim: true
-    },
+    // secondLastName:{
+    //   type: String,
+    //   required: true,
+    //   trim: true
+    // },
     email:{
       type: String,
       required: true,
       unique: true,
       lowercase:true,
-      /*
       validate: (value) => {
         if (!validator.isEmail(value)) {
           throw new Error({ error: "Invalid Email address" });
         }
-      },*/
+      },
     },
     RUT:{
       type: String,
       required: true,
       unique: true,
       lowercase: true,
-      /*
       validate: (value) => {
-        if (!validate(value)) {
+        if (!rut.validate(value)) {
           throw new Error({ error: "Invalid RUT Pacient!" });
         }
       },
-      */
     },
     phone:{
       type:Number,
@@ -60,7 +57,7 @@ const PacientSchema = mongoose.Schema(
       lowercase: true,
       validate: (value) => {
         if (value != "male" && value != "female") {
-          this.invalidate("sexo", "sex not found");
+          this.invalidate("gender", "sex not found");
         }
       },
     },
@@ -75,6 +72,11 @@ const PacientSchema = mongoose.Schema(
           });
         }
       },
+    },
+    address:{
+      type:String,
+      trim:true,
+      lowercase:true,
     },
     state:{
       type: Boolean,
@@ -147,5 +149,25 @@ PacientSchema.pre('save',async function(next){
   }
   next();
 });
+
+PacientSchema.statics.findByCredentials = async function (RUT, password){
+  try {
+    const user = await this.findOne({ RUT: rut.clean(RUT)}).exec();
+    // console.log({user});
+    if(user){
+      const match = await bcrypt.compare(password,user.password);
+      if(match){
+        return user;
+      }else{
+        const err = new Error('Incorrect Password');
+      }
+    }else{
+      const err = new Error('Rut not Registered!');
+    }
+  } catch (error) {
+    console.log({error});
+    return error;
+  }
+};
 
 module.exports = mongoose.model('Pacient',PacientSchema);

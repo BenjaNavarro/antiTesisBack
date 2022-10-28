@@ -12,12 +12,13 @@ TerapistController.NewTerapist = async(req,res) => {
         .send({ error: "USER RUT ALREADY REGISTERED!" });
     }else{
       const {
-        names,
-        firstLastName,
-        secondLastName,
+        name,
+        lastName,
+        // secondLastName,
         RUT,
         email,
         birthDate,
+        address,
         gender,
         phone,
         password,
@@ -26,12 +27,13 @@ TerapistController.NewTerapist = async(req,res) => {
       const createdTerapist = new Terapist(
         _.pickBy(
           {
-            names,
-            firstLastName,
-            secondLastName,
+            name,
+            lastName,
+            // secondLastName,
             RUT,
             email,
             birthDate,
+            address,
             gender,
             phone,
             password,
@@ -53,3 +55,5 @@ TerapistController.NewTerapist = async(req,res) => {
       .send({ name: error.name, info: error.message });
   }
 }
+
+module.exports = TerapistController;
