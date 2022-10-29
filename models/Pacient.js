@@ -171,9 +171,9 @@ PacientSchema.statics.findByCredentials = async function (RUT, password){
 };
 
 PacientSchema.methods.generateAuthToken = async function(){
-  console.log('generate auth token');
+  // console.log('generate auth token');
   const user = this;
-  console.log('JWT KEY',process.env.JWT_KEY);
+  // console.log('JWT KEY',process.env.JWT_KEY);
   const token = jwt.sign(
     {_id:user._id, type:user.type,email:user.email},process.env.JWT_KEY
   );
