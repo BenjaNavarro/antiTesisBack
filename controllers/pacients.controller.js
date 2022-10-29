@@ -32,8 +32,11 @@ PacientController.Login = async (req,res) => {
     // console.log({pacient});
     if (pacient) {
       console.log('PACIENT LOGIN SUCCESFULL!');
+      const token = await pacient.generateAuthToken();
+      console.log({token});
       return res
       .status(200)
+      .header({'x-auth-token':token})
       .json({status:200,pacient:pacient});
     }else{
       console.log('PACIENT NOT FOUND!');

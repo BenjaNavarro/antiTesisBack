@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 require('dotenv').config();
-// import { DotenvConfigOptions } from 'dotenv';
 const pacients = require('./routes/pacients');
 const admins = require('./routes/admins');
 const terapists = require('./routes/terapists');

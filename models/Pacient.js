@@ -4,9 +4,9 @@ const rut = require('rut.js');
 // const validate = rut.validate;
 const uniqueValidator = require('mongoose-unique-validator');
 const bcrypt = require('bcryptjs');
-// const jwt = require('jsonwebtoken');
-// const clean = rut.clean;
-// const format = rut.format;
+const jwt = require('jsonwebtoken');
+const clean = rut.clean;
+const format = rut.format;
 
 const PacientSchema = mongoose.Schema(
   {
@@ -97,25 +97,25 @@ const PacientSchema = mongoose.Schema(
       // required: true,
       minLength: 7,
     },
-    // verification_data: [
-    //   {
-    //     confirmationResetToken: {
-    //       type: String,
-    //     },
-    //     confirmationResetExpires: {
-    //       type: Date,
-    //       default: Date.now,
-    //     },
-    //   },
-    // ],
-    // tokens: [
-    //   {
-    //     token: {
-    //       type: String,
-    //       required: true,
-    //     },
-    //   },
-    // ],
+    verification_data: [
+      {
+        confirmationResetToken: {
+          type: String,
+        },
+        confirmationResetExpires: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
+    tokens: [
+      {
+        token: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
     terapist:{
       type: mongoose.Schema.Types.ObjectId,
       ref:'Terapist'
@@ -169,5 +169,17 @@ PacientSchema.statics.findByCredentials = async function (RUT, password){
     return error;
   }
 };
+
+PacientSchema.methods.generateAuthToken = async function(){
+  console.log('generate auth token');
+  const user = this;
+  console.log('JWT KEY',process.env.JWT_KEY);
+  const token = jwt.sign(
+    {_id:user._id, type:user.type,email:user.email},process.env.JWT_KEY
+  );
+  user.tokens = user.tokens.concat({ token });
+  await user.save();
+  return token;
+}
 
 module.exports = mongoose.model('Pacient',PacientSchema);
