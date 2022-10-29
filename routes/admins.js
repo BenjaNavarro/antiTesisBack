@@ -7,4 +7,6 @@ router.post('/admins/new_admin',AdminController.NewAdmin);
 
 router.post('/admins/login',AdminController.Login);
 
+router.get('/admins',AdminController.GetAdmins);
+
 module.exports = router;

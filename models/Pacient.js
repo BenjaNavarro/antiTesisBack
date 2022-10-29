@@ -131,7 +131,7 @@ PacientSchema.plugin(uniqueValidator);
 PacientSchema.pre('validate',async function(next){
   const user = this;
   if(user.isModified('RUT')){
-    user.RUT = clean(user.RUT);
+    user.RUT = rut.clean(user.RUT);
   }
   if (user.password != user.password_confirmation) {
     this.invalidate("passwordConfirmation", "must match confirmation.");

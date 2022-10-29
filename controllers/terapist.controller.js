@@ -2,6 +2,29 @@ const TerapistController = {};
 const Terapist = require('../models/Terapist');
 const _ = require('lodash');
 
+
+//GET /api/terapists
+TerapistController.GetTerapists = async(req,res) => {
+  try{
+    const terapists = await Terapist.find();
+    if(!terapists){
+      return res
+        .status(404)
+        .send({ error: "Not found"});
+    }else{
+      return res 
+        .status(200)
+        .send(terapists)
+    }
+  }catch(error){
+    res
+      .status(500)
+      .send({ name: error.name, info:error.message })
+  }
+}
+
+
+
 TerapistController.NewTerapist = async(req,res) => {
   try {
     const RUT = req.body.RUT;
