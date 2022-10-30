@@ -30,6 +30,8 @@ El proyecto utiliza el modelo de tres capas, donde la vista estaría implementad
 El el controlador utiliza una APIREST con métodos GET, POST y PUT;
 y la capa de datos en una base de datos no relacional utilizando mongoDB
 
+Link de front: https://github.com/BenjaNavarro/antiTesisFront.git
+
 #Referencias
 
 https://nodejs.org/en/docs/
