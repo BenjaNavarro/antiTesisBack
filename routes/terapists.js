@@ -5,4 +5,6 @@ const router = express.Router();
 
 router.post('/terapists/new',TerapistController.NewTerapist);
 
+router.get('/terapists',TerapistController.GetTerapists)
+
 module.exports = router;

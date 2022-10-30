@@ -2,6 +2,33 @@ const AdminController = {};
 const Admin = require('../models/Admin');
 const _ = require('lodash');
 
+
+//GET /api/admins
+AdminController.GetAdmins = async(req,res) => {
+  try{
+    const admins = await Admin.find();
+    if(!admins){
+      return res
+        .status(404)
+        .send({ error: "Admins not found"})
+    }
+    else{
+      return res
+        .status(200)
+        .send(admins)
+    }
+  }catch(error){
+    console.log("Error ",error);
+    res
+    .status(500)
+    .send({ name: error.name, info: error.message })
+  }
+  
+}
+
+
+
+
 // POST /api/admins/new_admin
 AdminController.NewAdmin = async(req,res) => {
   try {
