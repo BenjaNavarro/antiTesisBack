@@ -92,25 +92,25 @@ const TerapistSchema = mongoose.Schema(
       // required: true,
       minLength: 7,
     },
-    // verification_data: [
-    //   {
-    //     confirmationResetToken: {
-    //       type: String,
-    //     },
-    //     confirmationResetExpires: {
-    //       type: Date,
-    //       default: Date.now,
-    //     },
-    //   },
-    // ],
-    // tokens: [
-    //   {
-    //     token: {
-    //       type: String,
-    //       required: true,
-    //     },
-    //   },
-    // ],
+    verification_data: [
+      {
+        confirmationResetToken: {
+          type: String,
+        },
+        confirmationResetExpires: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
+    tokens: [
+      {
+        token: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
     pacients:[
       {
         onTherapy:{
@@ -153,34 +153,66 @@ TerapistSchema.pre('save',async function(next){
   next();
 });
 
-// TerapistSchema.methods.generateConfirmationToken = async function () {
-//   var token = jwt.sign({ email: this.email }, process.env.JWT_KEY);
-//   this.verification_data = { confirmationResetToken: token };
-//   await this.save();
-// };
+TerapistSchema.statics.findByCredentials = async function (RUT, password){
+  try {
+    const user = await this.findOne({ RUT: rut.clean(RUT)}).exec();
+    // console.log({user});
+    if(user){
+      const match = await bcrypt.compare(password,user.password);
+      if(match){
+        return user;
+      }else{
+        throw(new Error({message:'Incorrect Password',name:'password error'}))
+      }
+    }else{
+      throw(new Error({name:'rut error',message:'Rut not Registered!'}));
+    }
+  } catch (error) {
+    console.error({error});
+    return error;
+  }
+};
 
-// TerapistSchema.methods.generateAuthToken = async function () {
-//   // Generate an auth token for the user
-//   const user = this;
-//   const token = jwt.sign(
-//     { _id: user._id, tipo: "User", email: user.email },
-//     process.env.JWT_KEY
-//   );
-//   user.tokens = user.tokens.concat({ token });
-//   await user.save();
-//   return token;
-// };
+TerapistSchema.methods.generateAuthToken = async function () {
+  // Generate an auth token for the user
+  const user = this;
+  const token = jwt.sign(
+    { _id: user._id, tipo: user.type, email: user.email },
+    process.env.JWT_KEY
+  );
+  user.tokens = user.tokens.concat({ token });
+  await user.save();
+  return token;
+};
 
-// TerapistSchema.methods.ChangeAuthToken = async function (bad_token) {
-//   const user = this;
-//   user.tokens = user.tokens.filter((token) => {
-//     return token.token != bad_token;
-//   });
-//   await user.save();
-//   const new_token = await user.generateAuthToken();
-//   return new_token;
-// };
+TerapistSchema.methods.LogoutTerapist = async function(tkn){
+  const terapist = this;
+  user.tokens = user.tokens.filter((token)=>{
+    return token.token != tkn;
+  });
+  return await terapist.save();
+};
 
+TerapistSchema.methods.ChangeAuthToken = async function (tkn) {
+  const terapist = this;
+  console.log('first');
+  terapist.tokens = terapist.tokens.filter((token) => {
+    return token.token != tkn;
+  });
+  console.log('second');
+  await terapist.save();
+  console.log('third');
+  const newToken = await terapist.generateAuthToken();
+  console.log('fourth');
+  return newToken;
+};
+
+  // TerapistSchema.methods.generateConfirmationToken = async function () {
+  //   var token = jwt.sign({ email: this.email }, process.env.JWT_KEY);
+  //   this.verification_data = { confirmationResetToken: token };
+  //   await this.save();
+  // };
+  
 // TerapistSchema.methods.LogoutUser = async function (bad_token) {
 //   const user = this;
 //   user.tokens = user.tokens.filter((token) => {

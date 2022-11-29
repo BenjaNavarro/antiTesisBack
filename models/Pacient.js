@@ -170,6 +170,14 @@ PacientSchema.statics.findByCredentials = async function (RUT, password){
   }
 };
 
+PacientSchema.methods.LogoutPacient = async function(tkn){
+  const pacient = this;
+  user.tokens = user.tokens.filter((token)=>{
+    return token.token != tkn;
+  });
+  return await pacient.save();
+};
+
 PacientSchema.methods.generateAuthToken = async function(){
   // console.log('generate auth token');
   const user = this;
