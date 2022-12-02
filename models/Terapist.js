@@ -73,6 +73,11 @@ const TerapistSchema = mongoose.Schema(
         }
       },
     },
+    address:{
+      type:String,
+      trim:true,
+      lowercase:true,
+    },
     state:{
       type: Boolean,
       default: true
