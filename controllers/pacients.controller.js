@@ -35,9 +35,9 @@ PacientController.Login = async (req,res) => {
       const token = await pacient.generateAuthToken();
       // console.log({token});
       return res
-      .status(200)
-      .header({'x-auth-token':token,status:200})
-      .json({status:200,pacient:pacient});
+        .status(200)
+        .header({'x-auth-token':token,status:200})
+        .json({status:200,pacient});
     }else{
       console.log('PACIENT NOT FOUND!');
       return res
@@ -47,8 +47,24 @@ PacientController.Login = async (req,res) => {
   } catch (error) {
     console.log('PACIENT LOGIN ERROR!',error);
     res
+      .status(500)
+      .send({ name: error.name, info: error.message });
+  }
+}
+
+PacientController.Logout = async (req,res) => {
+  try {
+    const pacient = await req.user.Logout(req.token);
+    if(pacient){
+      return res.status(200).json({message:'logout soccesfull!',status:200});
+    }else{
+      throw(new Error({message:'Error! El controlador no pudo cerrar cesion!',name:'Logout Error'}));
+    }
+  } catch (error) {
+    console.error({error});
+    res
     .status(500)
-    .send({ name: error.name, info: error.message })
+    .send({ name: error.name, info: error.message });
   }
 }
 

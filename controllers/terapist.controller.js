@@ -79,4 +79,44 @@ TerapistController.NewTerapist = async(req,res) => {
   }
 }
 
+TerapistController.Login = async(req,res) => {
+  try {
+    const { rut, password } = req.body;
+    const terapist = await Terapist.findByCredentials(rut,password);
+    if(terapist){
+      const token = await terapist.generateAuthToken();
+      return res
+        .status(200)
+        .header({'x-auth-token':token,status:200})
+        .json({status:200,terapist});
+    }else{
+      console.log('TERAPIST NOT FOUND!');
+      return res
+      .status(400)
+      .json({status:400,message:'Terapist not found!'});
+    }
+  } catch (error) {
+    console.log('TERAPIST LOGIN ERROR!',error);
+    res
+      .status(500)
+      .send({ name: error.name, info: error.message });
+  }
+}
+
+TerapistController.Logout = async (req,res) => {
+  try {
+    const terapist = await req.user.Logout(req.token);
+    if(terapist){
+      return res.status(200).json({message:'logout soccesfull!',status:200});
+    }else{
+      throw(new Error({message:'Error! El controlador no pudo cerrar cesion!',name:'Logout Error'}));
+    }
+  } catch (error) {
+    console.error({error});
+    res
+      .status(500)
+      .send({ name: error.name, info: error.message });
+  }
+}
+
 module.exports = TerapistController;
