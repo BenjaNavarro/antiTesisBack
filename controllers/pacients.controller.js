@@ -6,7 +6,7 @@ const _ = require('lodash');
 PacientController.getPacients = async (req,res) => {
   try{
     const pacients =await Pacient.find();
-    console.log(pacients);
+    // console.log(pacients);
     if(!pacients){
       return res
         .status(404)
@@ -14,14 +14,40 @@ PacientController.getPacients = async (req,res) => {
     }else{
       return res
         .status(200)
-        .send(pacients)
+        .header({'x-auth-token':req.token})
+        .json({pacients,status:200})
     }
-  }catch{
-    res
-    .status(500)
-    .send({ name: error.name, info: error.message })
+  }catch(error){
+    console.error({error});
+    return res
+      .status(500)
+      .header({'x-auth-token':req.token})
+      .send({ name: error.name, info: error.message });
   }
+}
 
+PacientController.deletePacient = async(req,res) => {
+  try {
+    const id = req.params.id;
+    const pacient = await Pacient.findOneAndDelete({_id:id});
+    if(pacient){
+      return res
+        .status(200)
+        .header({'x-auth-token':req.token})
+        .json({status:200,pacient:pacient,message:'pacient deleted!'});
+    }else{
+      return res
+      .status(400)
+      .header({'x-auth-token':req.token})
+      .json({status:400,message:'pacient deleted failed!'});
+    }
+  } catch (error) {
+    console.error({error});
+    return res
+      .status(500)
+      .header({'x-auth-token':req.token})
+      .send({ name: error.name, info: error.message });
+  }
 }
 
 PacientController.Login = async (req,res) => {
@@ -31,7 +57,7 @@ PacientController.Login = async (req,res) => {
     const pacient = await Pacient.findByCredentials(rut,password);
     // console.log({pacient});
     if (pacient) {
-      console.log('PACIENT LOGIN SUCCESFULL!');
+      // console.log('PACIENT LOGIN SUCCESFULL!');
       const token = await pacient.generateAuthToken();
       // console.log({token});
       return res
@@ -39,13 +65,13 @@ PacientController.Login = async (req,res) => {
         .header({'x-auth-token':token,status:200})
         .json({status:200,pacient});
     }else{
-      console.log('PACIENT NOT FOUND!');
+      // console.log('PACIENT NOT FOUND!');
       return res
       .status(400)
       .json({status:400,message:'Pacient not found!'});
     }
   } catch (error) {
-    console.log('PACIENT LOGIN ERROR!',error);
+    // console.log('PACIENT LOGIN ERROR!',error);
     res
       .status(500)
       .send({ name: error.name, info: error.message });
