@@ -1,5 +1,6 @@
 const PacientController = {};
 const Pacient = require('../models/Pacient');
+const Terapist = require('../models/Terapist')
 const _ = require('lodash');
 
 //api/pacients GET
@@ -23,6 +24,27 @@ PacientController.getPacients = async (req,res) => {
       .status(500)
       .header({'x-auth-token':req.token})
       .send({ name: error.name, info: error.message });
+  }
+}
+
+PacientController.getPacientsByTerapistId = async(req,res) => {
+  try {
+    const id = req.body.id;
+    const terapist = await Terapist.findOne({_id:id});
+    if(terapist){
+      const pacients = await Pacient.find({terapist:id});
+      return res
+        .status(200)
+        .header({'x-auth-token':req.token})
+        .json({pacients,status:200});
+    }else{
+      return res
+        .status(400)
+        .header({'x-auth-token':req.token})
+        .json({status:400,message:'terapist not found!'});
+    }
+  } catch (error) {
+    console.error({error});
   }
 }
 
