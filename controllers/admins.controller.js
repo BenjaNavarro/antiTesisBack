@@ -90,8 +90,10 @@ AdminController.Login = async(req,res) => {
     const admin = await Admin.findByCredentials(rut,password);
     if (admin) {
       console.log('ADMIN LOGIN SUCCESFULL!');
+      const token = await admin.generateAuthToken();
       return res
         .status(200)
+        .header({'x-auth-token':token,status:200})
         .json({status:200,admin:admin});
     } else {
       console.log('ADMIN NOT FOUND!');
@@ -101,6 +103,22 @@ AdminController.Login = async(req,res) => {
     }
   } catch (error) {
     console.log('ADMIN LOGIN ERROR!',error);
+    res
+      .status(500)
+      .send({ name: error.name, info: error.message });
+  }
+}
+
+AdminController.Logout = async (req,res) => {
+  try {
+    const admin = await req.user.Logout(req.token);
+    if(admin){
+      return res.status(200).json({message:'logout soccesfull!',status:200});
+    }else{
+      throw(new Error({message:'Error! El controlador no pudo cerrar cesion!',name:'Logout Error'}));
+    }
+  } catch (error) {
+    console.error({error});
     res
       .status(500)
       .send({ name: error.name, info: error.message });

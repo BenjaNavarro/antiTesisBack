@@ -91,25 +91,25 @@ const AdminSchema = mongoose.Schema(
       // required: true,
       minLength: 7,
     },
-    // verification_data: [
-    //   {
-    //     confirmationResetToken: {
-    //       type: String,
-    //     },
-    //     confirmationResetExpires: {
-    //       type: Date,
-    //       default: Date.now,
-    //     },
-    //   },
-    // ],
-    // tokens: [
-    //   {
-    //     token: {
-    //       type: String,
-    //       required: true,
-    //     },
-    //   },
-    // ],
+    verification_data: [
+      {
+        confirmationResetToken: {
+          type: String,
+        },
+        confirmationResetExpires: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
+    tokens: [
+      {
+        token: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
   },
   {
     timestamps: true,
@@ -158,6 +158,44 @@ AdminSchema.statics.findByCredentials = async function (RUT, password){
     console.log({error});
     return error;
   }
+};
+
+AdminSchema.methods.generateAuthToken = async function (){
+    // console.log('generate auth token');
+    const user = this;
+    // console.log('JWT KEY',process.env.JWT_KEY);
+    const token = jwt.sign(
+      {_id:user._id, type:user.type,email:user.email},process.env.JWT_KEY
+    );
+    user.tokens = user.tokens.concat({ token });
+    await user.save();
+    return token;
+}
+
+AdminSchema.methods.LogoutAdmin = async function(){
+    // console.log('generate auth token');
+    const user = this;
+    // console.log('JWT KEY',process.env.JWT_KEY);
+    const token = jwt.sign(
+      {_id:user._id, type:user.type,email:user.email},process.env.JWT_KEY
+    );
+    user.tokens = user.tokens.concat({ token });
+    await user.save();
+    return token;
+}
+
+AdminSchema.methods.ChangeAuthToken = async function (tkn) {
+  const admin = this;
+  // console.log('first');
+  admin.tokens = admin.tokens.filter((token) => {
+    return token.token != tkn;
+  });
+  // console.log('second');
+  await admin.save();
+  // console.log('third');
+  const newToken = await admin.generateAuthToken();
+  // console.log('fourth');
+  return newToken;
 };
 
 module.exports = mongoose.model('Admin',AdminSchema);

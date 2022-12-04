@@ -6,7 +6,7 @@ const _ = require('lodash');
 PacientController.getPacients = async (req,res) => {
   try{
     const pacients =await Pacient.find();
-    console.log(pacients);
+    // console.log(pacients);
     if(!pacients){
       return res
         .status(404)
@@ -14,14 +14,15 @@ PacientController.getPacients = async (req,res) => {
     }else{
       return res
         .status(200)
-        .send(pacients)
+        .header({'x-auth-token':req.token})
+        .json({pacients,status:200})
     }
-  }catch{
-    res
-    .status(500)
-    .send({ name: error.name, info: error.message })
+  }catch(error){
+    console.error({error});
+    return res
+      .status(500)
+      .send({ name: error.name, info: error.message });
   }
-
 }
 
 PacientController.Login = async (req,res) => {
