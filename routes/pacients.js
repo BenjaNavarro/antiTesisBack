@@ -10,4 +10,6 @@ router.get('/pacients',Auth,PacientController.getPacients);
 
 router.post('/pacients/login',PacientController.Login);
 
+router.delete('/pacients/:id/deletepacient',Auth,PacientController.deletePacient);
+
 module.exports = router;
