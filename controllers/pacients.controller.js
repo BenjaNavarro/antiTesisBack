@@ -30,9 +30,11 @@ PacientController.getPacients = async (req,res) => {
 PacientController.getPacientsByTerapistId = async(req,res) => {
   try {
     const id = req.body.id;
+    console.log(id);
     const terapist = await Terapist.findOne({_id:id});
     if(terapist){
       const pacients = await Pacient.find({terapist:id});
+      console.log(pacients);
       return res
         .status(200)
         .header({'x-auth-token':req.token})
