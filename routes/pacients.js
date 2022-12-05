@@ -12,4 +12,6 @@ router.post('/pacients/login',PacientController.Login);
 
 router.delete('/pacients/:id/deletepacient',Auth,PacientController.deletePacient);
 
+router.put('/pacients/putPacient',Auth,PacientController.PutPacient);
+
 module.exports = router;

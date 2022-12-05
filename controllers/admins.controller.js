@@ -111,7 +111,7 @@ AdminController.Login = async(req,res) => {
 
 AdminController.Logout = async (req,res) => {
   try {
-    const admin = await req.user.Logout(req.token);
+    const admin = await req.user.LogoutAdmin(req.token);
     if(admin){
       return res.status(200).json({message:'logout soccesfull!',status:200});
     }else{

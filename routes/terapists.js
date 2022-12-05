@@ -12,4 +12,8 @@ router.post('/terapists/login',TerapistController.Login);
 
 router.get('/terapists',Auth,TerapistController.GetTerapists);
 
+router.delete('/terapists/:id/deleteTerapist',Auth,TerapistController.DeleteTerapist);
+
+router.put('/terapists/putTerapist',Auth,TerapistController.PutTerapist);
+
 module.exports = router;

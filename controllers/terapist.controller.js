@@ -9,21 +9,23 @@ TerapistController.GetTerapists = async(req,res) => {
     const terapists = await Terapist.find();
     if(!terapists){
       return res
-        .status(404)
-        .send({ error: "Not found"});
+        .status(400)
+        .header({'x-auth-token':req.token})
+        .json({ error: "Not found"});
     }else{
       return res 
         .status(200)
-        .send(terapists)
+        .header({'x-auth-token':req.token})
+        .json({terapists,status:200})
     }
   }catch(error){
+    console.error({error});
     res
       .status(500)
-      .send({ name: error.name, info:error.message })
+      .header({'x-auth-token':req.token})
+      .send({ name: error.name, info:error.message });
   }
 }
-
-
 
 TerapistController.NewTerapist = async(req,res) => {
   try {
@@ -116,6 +118,89 @@ TerapistController.Logout = async (req,res) => {
     res
       .status(500)
       .send({ name: error.name, info: error.message });
+  }
+}
+
+TerapistController.DeleteTerapist = async (req,res) => {
+  try {
+    const id = req.params.id;
+    const terapist = await Terapist.findOneAndDelete({_id:id});
+    if(terapist){
+      return res
+        .status(200)
+        .header({'x-auth-token':req.token})
+        .json({status:200,terapist,message:'terapist deleted!'});
+    }else{
+      return res
+        .status(400)
+        .header({'x-auth-token':req.token})
+        .json({status:400,message:'terapist deleted failed!'});
+    }
+  } catch (error) {
+    console.error({error});
+    res
+      .status(500)
+      .header({'x-auth-token':req.token})
+      .send({ name: error.name, info:error.message });
+  }
+}
+
+TerapistController.PutTerapist = async (req,res) => {
+  try {
+    const RUT = req.body.RUT;
+    const terapist = await Terapist.findOne({RUT:RUT});
+    if(terapist){
+      return res
+        .status(400)
+        .header({'x-auth-token':req.token})
+        .send({ error: "USER RUT ALREADY REGISTERED!" });
+    }else{
+      const {
+        name,
+        lastName,
+        // secondLastName,
+        RUT,
+        email,
+        birthDate,
+        address,
+        gender,
+        phone,
+        password,
+        password_confirmation
+      } = req.body;
+      const createdTerapist = new Terapist(
+        _.pickBy(
+          {
+            name,
+            lastName,
+            // secondLastName,
+            RUT,
+            email,
+            birthDate,
+            address,
+            gender,
+            phone,
+            password,
+            password_confirmation
+          },
+          _.identity
+        )
+      );
+      await createdTerapist.save();
+      if(createdTerapist){
+        console.log('TERAPIST REGISTRATION SUCCESFULL!');
+        return res
+          .status(200)
+          .header({'x-auth-token':req.token})
+          .json({message:"newPacient",terapist:createdTerapist,status:200});
+      }
+    }
+  } catch (error) {
+    console.error({error});
+    res
+      .status(500)
+      .header({'x-auth-token':req.token})
+      .send({ name: error.name, info:error.message });
   }
 }
 

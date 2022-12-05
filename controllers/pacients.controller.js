@@ -11,6 +11,7 @@ PacientController.getPacients = async (req,res) => {
     if(!pacients){
       return res
         .status(404)
+        .header({'x-auth-token':req.token})
         .send({ error: "Pacients not found"})
     }else{
       return res
@@ -59,9 +60,9 @@ PacientController.deletePacient = async(req,res) => {
         .json({status:200,pacient:pacient,message:'pacient deleted!'});
     }else{
       return res
-      .status(400)
-      .header({'x-auth-token':req.token})
-      .json({status:400,message:'pacient deleted failed!'});
+        .status(400)
+        .header({'x-auth-token':req.token})
+        .json({status:400,message:'pacient deleted failed!'});
     }
   } catch (error) {
     console.error({error});
@@ -161,7 +162,9 @@ PacientController.newPacient = async (req,res) => {
       await createdPacient.save();
       if(createdPacient){
         console.log('PACIENT REGISTRATION SUCCESFULL!');
-        return res.status(200).json({message:"newPacient",pacient:createdPacient,status:200});
+        return res
+          .status(200)
+          .json({message:"newPacient",pacient:createdPacient,status:200});
       }
     }
   } catch (error) {
@@ -169,6 +172,65 @@ PacientController.newPacient = async (req,res) => {
     res
     .status(500)
     .send({ name: error.name, info: error.message });
+  }
+}
+
+PacientController.PutPacient = async(req,res) => {
+  try {
+    const RUT = req.body.RUT;
+    const pacient = await Pacient.findOne({RUT:RUT});
+    if(pacient){
+      return res
+      .status(400)
+      .header({'x-auth-token':req.token})
+      .send({ error: "USER RUT ALREADY REGISTERED!" });
+    }else{
+      const {
+        name,
+        lastName,
+        // secondLastName,
+        RUT,
+        email,
+        birthDate,
+        address,
+        gender,
+        phone,
+        password,
+        password_confirmation
+      } = req.body;
+      const createdPacient = new Pacient(
+        _.pickBy(
+          {
+            name,
+            lastName,
+            // secondLastName,
+            RUT,
+            email,
+            birthDate,
+            address,
+            gender,
+            phone,
+            password,
+            password_confirmation
+          },
+          _.identity
+        )
+      );
+      await createdPacient.save();
+      if(createdPacient){
+        console.log('PACIENT REGISTRATION SUCCESFULL!');
+        return res
+          .status(200)
+          .header({'x-auth-token':req.token})
+          .json({message:"newPacient",pacient:createdPacient,status:200});
+      }
+    }
+  } catch (error) {
+    console.error({error});
+    return res
+      .status(500)
+      .header({'x-auth-token':req.token})
+      .send({ name: error.name, info: error.message });
   }
 }
 
