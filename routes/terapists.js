@@ -16,4 +16,6 @@ router.delete('/terapists/:id/deleteTerapist',Auth,TerapistController.DeleteTera
 
 router.put('/terapists/putTerapist',Auth,TerapistController.PutTerapist);
 
+router.get('/terapists/:id/changeState',Auth,TerapistController.ChangeStateTerapist);
+
 module.exports = router;

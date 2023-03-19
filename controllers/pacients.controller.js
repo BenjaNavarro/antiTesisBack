@@ -220,12 +220,45 @@ PacientController.PutPacient = async(req,res) => {
       );
       await createdPacient.save();
       if(createdPacient){
-        console.log('PACIENT REGISTRATION SUCCESFULL!');
+        // console.log('PACIENT REGISTRATION SUCCESFULL!');
         return res
           .status(200)
           .header({'x-auth-token':req.token})
           .json({message:"newPacient",pacient:createdPacient,status:200});
       }
+    }
+  } catch (error) {
+    console.error({error});
+    return res
+      .status(500)
+      .header({'x-auth-token':req.token})
+      .send({ name: error.name, info: error.message });
+  }
+}
+
+PacientController.changeStatePacient = async(req,res) => {
+  try {
+    const pacientID = req.params.id;
+    const pacient = await Pacient.findOne({_id:pacientID});
+    if(!pacient){
+      return res
+        .status(400)
+        .header({'x-auth-token':req.token})
+        .json({message:"Pacient not found!",status:200});
+    }
+    pacient.state = !pacient.state;
+    const result = await pacient.save();
+    if(result){
+      const message = pacient.state?"Pacient Activated":"Pacient Disabled";
+      return res
+        .status(200)
+        .header({'x-auth-token':req.token})
+        .json({message:message,pacient:pacient,status:200});
+    }else{
+      return res
+        .status(400)
+        .header({'x-auth-token':req.token})
+        .json({message:"Pacient state couldn't be changed!",pacient:pacient,status:400});
     }
   } catch (error) {
     console.error({error});

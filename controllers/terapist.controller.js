@@ -188,12 +188,45 @@ TerapistController.PutTerapist = async (req,res) => {
       );
       await createdTerapist.save();
       if(createdTerapist){
-        console.log('TERAPIST REGISTRATION SUCCESFULL!');
+        // console.log('TERAPIST REGISTRATION SUCCESFULL!');
         return res
           .status(200)
           .header({'x-auth-token':req.token})
           .json({message:"newPacient",terapist:createdTerapist,status:200});
       }
+    }
+  } catch (error) {
+    console.error({error});
+    res
+      .status(500)
+      .header({'x-auth-token':req.token})
+      .send({ name: error.name, info:error.message });
+  }
+}
+
+TerapistController.ChangeStateTerapist = async(req,res) => {
+  try {
+    const terapistID = req.params.id;
+    const terapist = await Terapist.findOne({_id:terapistID});
+    if(!terapist){
+      return res
+        .status(400)
+        .header({'x-auth-token':req.token})
+        .json({message:"Terapist not found!",status:400});
+    }
+    terapist.state = !terapist.state;
+    result = await terapist.save();
+    if(result){
+      const message = terapist.state?"Terapist Activated":"Terapist Disabled";
+      return res
+        .status(200)
+        .header({'x-auth-token':req.token})
+        .json({message:message,terapist:terapist,status:200});
+    }else{
+      return res
+        .status(400)
+        .header({'x-auth-token':req.token})
+        .json({message:"Terapist state couldn't be changed!",terapist:terapist,status:400});
     }
   } catch (error) {
     console.error({error});

@@ -5,8 +5,7 @@ const validate = rut.validate;
 const uniqueValidator = require('mongoose-unique-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const clean = rut.clean;
-const format = rut.format;
+const {clean,format} = rut;
 
 const TerapistSchema = mongoose.Schema(
   {
