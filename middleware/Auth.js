@@ -14,7 +14,7 @@ async function Auth(req,res,next){
       const data = jwt.verify(token, process.env.JWT_KEY);
       // console.log({data});
       if(data.type == 'admin'){
-        console.log({token});
+        // console.log({token});
         const admin = await Admin.findOne({_id:data._id,'tokens.token':token});
         // console.log({admin});
         req.type = 'admin';

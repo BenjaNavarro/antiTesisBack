@@ -237,4 +237,50 @@ TerapistController.ChangeStateTerapist = async(req,res) => {
   }
 }
 
+TerapistController.ChangePassword = async(req,res) => {
+  try {
+    const terapistID = req.params.id;
+    const {password,password_confirmation} = req.body;
+    const user = await Terapist.findOne({_id:terapistID});
+    if(!user){
+      return res
+        .status(400)
+        .header({'x-auth-token':req.token})
+        .json({message:"User not found"});
+    }
+    if(!password || !password_confirmation){
+      return res
+        .status(400)
+        .header({'x-auth-token':req.token})
+        .json({message:"Password not provided!"});
+    }
+    if(password !== password_confirmation){
+      return res
+        .status(400)
+        .header({'x-auth-token':req.token})
+        .json({message:"Password and password confirmation must be equal!"});
+    }
+    user.password = password;
+    user.password_confirmation = password_confirmation;
+    const result = await user.save();
+    if(!result){
+      return res
+        .status(400)
+        .header({'x-auth-token':req.token})
+        .json({message:"Terapist password couldn't be changed!"});
+    }else{
+      return res
+        .status(200)
+        .header({'x-auth-token':req.token})
+        .json({message:"Terapist password changed!",terapist:user});
+    }
+  } catch (error) {
+    console.error({error});
+    return res
+      .status(500)
+      .header({'x-auth-token':req.token})
+      .send({ name: error.name, info: error.message });
+  }
+}
+
 module.exports = TerapistController;

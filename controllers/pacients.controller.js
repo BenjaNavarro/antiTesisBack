@@ -163,7 +163,7 @@ PacientController.newPacient = async (req,res) => {
       );
       await createdPacient.save();
       if(createdPacient){
-        console.log('PACIENT REGISTRATION SUCCESFULL!');
+        // console.log('PACIENT REGISTRATION SUCCESFULL!');
         return res
           .status(200)
           .json({message:"newPacient",pacient:createdPacient,status:200});
@@ -259,6 +259,52 @@ PacientController.changeStatePacient = async(req,res) => {
         .status(400)
         .header({'x-auth-token':req.token})
         .json({message:"Pacient state couldn't be changed!",pacient:pacient,status:400});
+    }
+  } catch (error) {
+    console.error({error});
+    return res
+      .status(500)
+      .header({'x-auth-token':req.token})
+      .send({ name: error.name, info: error.message });
+  }
+}
+
+PacientController.ChangePassword = async(req,res) => {
+  try {
+    const pacientID = req.params.id;
+    const {password,password_confirmation} = req.body;
+    const user = await Pacient.findOne({_id:pacientID});
+    if(!user){
+      return res
+        .status(400)
+        .header({'x-auth-token':req.token})
+        .json({message:"User not found"});
+    }
+    if(!password || !password_confirmation){
+      return res
+        .status(400)
+        .header({'x-auth-token':req.token})
+        .json({message:"Password not provided!"});
+    }
+    if(password !== password_confirmation){
+      return res
+        .status(400)
+        .header({'x-auth-token':req.token})
+        .json({message:"Password and password confirmation must be equal!"});
+    }
+    user.password = password;
+    user.password_confirmation = password_confirmation;
+    const result = await user.save();
+    if(!result){
+      return res
+        .status(400)
+        .header({'x-auth-token':req.token})
+        .json({message:"Pacient password couldn't be changed!"});
+    }else{
+      return res
+        .status(200)
+        .header({'x-auth-token':req.token})
+        .json({message:"Pacient password changed!",pacient:user});
     }
   } catch (error) {
     console.error({error});

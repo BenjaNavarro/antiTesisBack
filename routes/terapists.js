@@ -18,4 +18,6 @@ router.put('/terapists/putTerapist',Auth,TerapistController.PutTerapist);
 
 router.get('/terapists/:id/changeState',Auth,TerapistController.ChangeStateTerapist);
 
+router.post('/terapists/:id/changePassword',Auth,TerapistController.ChangePassword);
+
 module.exports = router;

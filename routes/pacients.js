@@ -18,4 +18,6 @@ router.put('/pacients/putPacient',Auth,PacientController.PutPacient);
 
 router.get('/pacients/:id/changeState',Auth,PacientController.changeStatePacient);
 
+router.post('/pacients/:id/changePassword',Auth,PacientController.ChangePassword);
+
 module.exports = router;
