@@ -12,4 +12,6 @@ router.get('/admins',AdminController.GetAdmins);
 
 router.post('/admins/logout',Auth,AdminController.Logout);
 
+router.post('/admins/:id/update',Auth,AdminController.Update);
+
 module.exports = router;

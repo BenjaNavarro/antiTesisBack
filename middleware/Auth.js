@@ -14,7 +14,7 @@ async function Auth(req,res,next){
       const data = jwt.verify(token, process.env.JWT_KEY);
       // console.log({data});
       if(data.type == 'admin'){
-        // console.log({token});
+        // console.log({providedToken:token});
         const admin = await Admin.findOne({_id:data._id,'tokens.token':token});
         // console.log({admin});
         req.type = 'admin';
@@ -23,11 +23,13 @@ async function Auth(req,res,next){
           // console.log({newToken});
           req.user = admin;
           req.token = newToken;
+          // console.log({newToken:token});
           return next();
         }else{
           var newToken = token;
           req.user = admin;
           req.token = newToken;
+          // console.log({newToken:token});
           return next();
         }
       }else if(data.type == 'terapist'){
@@ -75,7 +77,8 @@ async function Auth(req,res,next){
       // req.token = newToken;
       // next();
     } catch (error) {
-      res.status(401).json({ error: "Not authorized to access this resource" });
+      console.error({error});
+      res.status(401).json({ error: "Not authorized to access this resource",message:error.message });
     }
   }
 }

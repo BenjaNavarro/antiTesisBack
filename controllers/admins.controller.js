@@ -9,7 +9,7 @@ AdminController.GetAdmins = async(req,res) => {
     const admins = await Admin.find();
     if(!admins){
       return res
-        .status(404)
+        .status(400)
         .send({ error: "Admins not found"})
     }
     else{
@@ -72,12 +72,12 @@ AdminController.NewAdmin = async(req,res) => {
       );
       await createdAdmin.save();
       if(createdAdmin){
-        console.log('ADMIN REGISTRATION SUCCESFULL!');
+        // console.log('ADMIN REGISTRATION SUCCESFULL!');
         return res.status(200).json({message:"newAdmin",Admin:createdAdmin,status:200});
       }
     }
   } catch (error) {
-    console.log('TERAPIST REGISTRATION ERROR!',error);
+    console.error({error});
     res
       .status(500)
       .send({ name: error.name, info: error.message });
@@ -89,20 +89,18 @@ AdminController.Login = async(req,res) => {
     const { rut, password } = req.body;
     const admin = await Admin.findByCredentials(rut,password);
     if (admin) {
-      console.log('ADMIN LOGIN SUCCESFULL!');
       const token = await admin.generateAuthToken();
       return res
         .status(200)
-        .header({'x-auth-token':token,status:200})
+        .header({'x-auth-token':token})
         .json({status:200,admin:admin});
     } else {
-      console.log('ADMIN NOT FOUND!');
       return res
-      .status(400)
-      .json({status:400,message:'Admin not found!'});
+        .status(400)
+        .json({status:400,message:'Admin not found!'});
     }
   } catch (error) {
-    console.log('ADMIN LOGIN ERROR!',error);
+    console.error({error});
     res
       .status(500)
       .send({ name: error.name, info: error.message });
@@ -122,6 +120,35 @@ AdminController.Logout = async (req,res) => {
     res
       .status(500)
       .send({ name: error.name, info: error.message });
+  }
+}
+
+AdminController.Update = async (req,res) => {
+  try {
+    const adminId = req.params.id;
+    const UpdateOps = req.body.User;
+    Admin.findOneAndUpdate({_id:adminId},{$set:UpdateOps},{new:true},(err,result) => {
+      if(err){
+        // console.log({err});
+        return res
+          .status(400)
+          .header({'x-auth-token':req.token})
+          .json({ message: "Ha ocurrido un error", error: err });
+      }else{
+        // console.log({result});
+        // console.log({token:req.token});
+        return res
+          .status(200)
+          .header({'x-auth-token':req.token})
+          .json({message: 'User updated',user: result});
+      }
+    });
+  } catch (error) {
+    console.error({error});
+    res
+    .status(500)
+    .header({'x-auth-token':req.token})
+    .send({ name: error.name, info: error.message });
   }
 }
 
